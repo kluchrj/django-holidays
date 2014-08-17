@@ -21,12 +21,14 @@ class Holiday(models.Model):
     }
     name = models.CharField(max_length=64)
     month = models.PositiveSmallIntegerField(choices=MONTHS.items())
+    paid_holiday = models.BooleanField(default=False,
+        help_text='If using this app for a business, is the holiday a paid holiday?')
 
     class Meta:
         abstract = False
 
     def __unicode__(self):
-        return unicode(self.name)
+        return unicode('%s (%s)') % (self.name, 'PAID' if self.paid_holiday else 'not paid')
 
     @classmethod
     def get_date_for_year(cls, name, year=datetime.date.today().year):
@@ -77,13 +79,18 @@ class Holiday(models.Model):
         try:
             holiday = NthXDayAfterHoliday.objects.get(name=name)
             count = 0
-            after_count = 0
-            date = datetime.date(year, holiday.month, 1)
-            while count < holiday.nth or after_count < holiday.after_nth:
-                if after_count >= holiday.after_day_of_week and date.weekday() == holiday.day_of_week:
+            after_date = datetime.date(year, holiday.month, 1)
+            while count < holiday.after_nth:
+                if after_date.weekday() == holiday.day_of_week:
                     count += 1
-                if date.weekday() == holiday.after_day_of_week:
-                    after_count += 1
+                after_date += relativedelta(days=1)
+            after_date -= relativedelta(days=1)
+            
+            date = after_date
+            count = 0
+            while count < holiday.nth:
+                if date.weekday() == holiday.day_of_week:
+                    count += 1
                 date += relativedelta(days=1)
             date -= relativedelta(days=1)
             return date
@@ -106,21 +113,30 @@ class Holiday(models.Model):
         return [h['name'] for h in Holiday.objects.all().values('name').distinct()]
 
     @classmethod
-    def get_holidays_for_year(cls, year=datetime.date.today().year):
+    def get_holidays_for_year(cls, year=datetime.date.today().year, kwargs={}):
         """Returns a list of holiday obects for the provided year, defaults
         to the current year.
         """
         holidays = []
-        for h in StaticHoliday.objects.filter():
+        for h in StaticHoliday.objects.filter(**kwargs):
             holidays.append(h)
-        for h in NthXDayHoliday.objects.filter():
+        for h in NthXDayHoliday.objects.filter(**kwargs):
             holidays.append(h)
-        for h in NthXDayAfterHoliday.objects.filter():
+        for h in NthXDayAfterHoliday.objects.filter(**kwargs):
             holidays.append(h)
-        for h in CustomHoliday.objects.filter(year=year):
+        kwargs['year'] = year
+        for h in CustomHoliday.objects.filter(**kwargs):
             holidays.append(h)
 
-        # TODO: sort these
+        json_holidays = []
+        for holiday in holidays:
+            json_holidays.append({
+                'name': holiday.name,
+                'date': cls.get_date_for_year(holiday.name, year),
+                'paid': holiday.paid_holiday,
+                'id': holiday.id})
+        json_holidays = sorted(json_holidays, key=lambda h: h['date'])
+        return json_holidays
         return holidays
 
     @classmethod
