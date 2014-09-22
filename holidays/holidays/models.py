@@ -136,8 +136,10 @@ class Holiday(models.Model):
                 'paid': holiday.paid_holiday,
                 'id': holiday.id})
         json_holidays = sorted(json_holidays, key=lambda h: h['date'])
+        # TODO: consider using a generator here... since we need them sorted,
+        #       probably cannot work.  Although we could sort them above and
+        #       have a generator on the to_json part.
         return json_holidays
-        return holidays
 
     @classmethod
     def is_holiday(cls, date):
