@@ -118,6 +118,8 @@ class Holiday(models.Model):
         to the current year.
         """
         holidays = []
+        if 'year' in kwargs:
+            del kwargs['year']
         for h in StaticHoliday.objects.filter(**kwargs):
             holidays.append(h)
         for h in NthXDayHoliday.objects.filter(**kwargs):
