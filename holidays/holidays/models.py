@@ -47,7 +47,12 @@ class Holiday(models.Model):
         # month/day each year
         try:
             holiday = StaticHoliday.objects.get(name=name)
-            return datetime.date(year, holiday.month, holiday.day)
+            day = datetime.date(year, holiday.month, holiday.day)
+            if day.weekday() == 5:
+                day -= datetime.timedelta(days=1)
+            elif day.weekday() == 6:
+                day += datetime.timedelta(days=1)
+            return day
         except:
             pass
 
@@ -144,6 +149,17 @@ class Holiday(models.Model):
         return json_holidays
 
     @classmethod
+    def holidays_between_dates(cls, start_date, end_date, kwargs={}):
+        all_holidays = []
+        holidays = []
+        for year in range(start_date.year, end_date.year+1):
+            all_holidays.extend(cls.get_holidays_for_year(year=year, kwargs=kwargs))
+        for holiday in all_holidays:
+            if holiday['date'] >= start_date and holiday['date'] <= end_date:
+                holidays.append(holiday)
+        return holidays
+
+    @classmethod
     def is_holiday(cls, date):
         """Determines if the provided date is a holiday.  If so, returns the
         holiday object.  Otherwise returns False.
@@ -161,8 +177,33 @@ class Holiday(models.Model):
         # check all other holidays in the year to see if the provided date
         # is a recorded holiday
         for h in cls.get_holidays_for_year(date.year):
-            if cls.get_date_for_year(name=h.name, year=date.year) == date:
+            if cls.get_date_for_year(name=h['name'], year=date.year) == date:
                 return h
+
+        # defaults to returning False
+        return False
+
+    @classmethod
+    def is_paid_holiday(cls, date):
+        """Determines if the provided date is a holiday.  If so, returns the
+        holiday object.  Otherwise returns False.
+        """
+        # TODO: improve how this is done, specifically the second check
+        # (after checking the easy StaticHoliday table)
+
+        # checkt the StaticHoliday to see if the month and day exist in here.
+        try:
+            h = StaticHoliday.objects.get(month=date.month, day=date.day, paid_holiday=True)
+            return h
+        except:
+            pass
+
+        # check all other holidays in the year to see if the provided date
+        # is a recorded holiday
+        for h in cls.get_holidays_for_year(date.year):
+            if cls.get_date_for_year(name=h['name'], year=date.year) == date:
+                if h['paid']:
+                    return h
 
         # defaults to returning False
         return False
