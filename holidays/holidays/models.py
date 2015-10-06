@@ -123,8 +123,7 @@ class Holiday(models.Model):
         to the current year.
         """
         holidays = []
-        if 'year' in kwargs:
-            del kwargs['year']
+        kwargs_year = kwargs.pop('year', datetime.date.today().year)
         for h in StaticHoliday.objects.filter(**kwargs):
             holidays.append(h)
         for h in NthXDayHoliday.objects.filter(**kwargs):
@@ -152,6 +151,7 @@ class Holiday(models.Model):
     def holidays_between_dates(cls, start_date, end_date, kwargs={}):
         all_holidays = []
         holidays = []
+        kwargs_year = kwargs.pop('year', datetime.date.today().year)
         for year in range(start_date.year, end_date.year+1):
             all_holidays.extend(cls.get_holidays_for_year(year=year, kwargs=kwargs))
         for holiday in all_holidays:
@@ -176,7 +176,7 @@ class Holiday(models.Model):
 
         # check all other holidays in the year to see if the provided date
         # is a recorded holiday
-        for h in cls.get_holidays_for_year(date.year):
+        for h in cls.get_holidays_for_year(year=date.year):
             if cls.get_date_for_year(name=h['name'], year=date.year) == date:
                 return h
 
@@ -200,7 +200,7 @@ class Holiday(models.Model):
 
         # check all other holidays in the year to see if the provided date
         # is a recorded holiday
-        for h in cls.get_holidays_for_year(date.year):
+        for h in cls.get_holidays_for_year(year=date.year):
             if cls.get_date_for_year(name=h['name'], year=date.year) == date:
                 if h['paid']:
                     return h
