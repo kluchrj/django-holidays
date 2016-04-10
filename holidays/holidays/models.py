@@ -126,8 +126,10 @@ class Holiday(models.Model):
         kwargs_year = kwargs.pop('year', datetime.date.today().year)
         for h in StaticHoliday.objects.filter(**kwargs):
             holidays.append(h)
+        kwargs.pop('year', datetime.date.today().year)
         for h in NthXDayHoliday.objects.filter(**kwargs):
             holidays.append(h)
+        kwargs.pop('year', datetime.date.today().year)
         for h in NthXDayAfterHoliday.objects.filter(**kwargs):
             holidays.append(h)
         kwargs['year'] = year
@@ -190,6 +192,7 @@ class Holiday(models.Model):
         """
         # TODO: improve how this is done, specifically the second check
         # (after checking the easy StaticHoliday table)
+        print 'date', date
 
         # checkt the StaticHoliday to see if the month and day exist in here.
         try:

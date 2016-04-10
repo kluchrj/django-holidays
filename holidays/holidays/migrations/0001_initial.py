@@ -1,104 +1,62 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Holiday'
-        db.create_table(u'holidays_holiday', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=64)),
-            ('month', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-        ))
-        db.send_create_signal(u'holidays', ['Holiday'])
+    dependencies = [
+    ]
 
-        # Adding model 'StaticHoliday'
-        db.create_table(u'holidays_staticholiday', (
-            (u'holiday_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['holidays.Holiday'], unique=True, primary_key=True)),
-            ('day', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-        ))
-        db.send_create_signal(u'holidays', ['StaticHoliday'])
-
-        # Adding model 'NthXDayHoliday'
-        db.create_table(u'holidays_nthxdayholiday', (
-            (u'holiday_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['holidays.Holiday'], unique=True, primary_key=True)),
-            ('nth', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-            ('day_of_week', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-        ))
-        db.send_create_signal(u'holidays', ['NthXDayHoliday'])
-
-        # Adding model 'NthXDayAfterHoliday'
-        db.create_table(u'holidays_nthxdayafterholiday', (
-            (u'holiday_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['holidays.Holiday'], unique=True, primary_key=True)),
-            ('nth', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-            ('day_of_week', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-            ('after_nth', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-            ('after_day_of_week', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-        ))
-        db.send_create_signal(u'holidays', ['NthXDayAfterHoliday'])
-
-        # Adding model 'CustomHoliday'
-        db.create_table(u'holidays_customholiday', (
-            (u'holiday_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['holidays.Holiday'], unique=True, primary_key=True)),
-            ('day', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-            ('year', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
-        ))
-        db.send_create_signal(u'holidays', ['CustomHoliday'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Holiday'
-        db.delete_table(u'holidays_holiday')
-
-        # Deleting model 'StaticHoliday'
-        db.delete_table(u'holidays_staticholiday')
-
-        # Deleting model 'NthXDayHoliday'
-        db.delete_table(u'holidays_nthxdayholiday')
-
-        # Deleting model 'NthXDayAfterHoliday'
-        db.delete_table(u'holidays_nthxdayafterholiday')
-
-        # Deleting model 'CustomHoliday'
-        db.delete_table(u'holidays_customholiday')
-
-
-    models = {
-        u'holidays.customholiday': {
-            'Meta': {'object_name': 'CustomHoliday', '_ormbases': [u'holidays.Holiday']},
-            'day': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            u'holiday_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['holidays.Holiday']", 'unique': 'True', 'primary_key': 'True'}),
-            'year': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
-        },
-        u'holidays.holiday': {
-            'Meta': {'object_name': 'Holiday'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'month': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '64'})
-        },
-        u'holidays.nthxdayafterholiday': {
-            'Meta': {'object_name': 'NthXDayAfterHoliday', '_ormbases': [u'holidays.Holiday']},
-            'after_day_of_week': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            'after_nth': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            'day_of_week': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            u'holiday_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['holidays.Holiday']", 'unique': 'True', 'primary_key': 'True'}),
-            'nth': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
-        },
-        u'holidays.nthxdayholiday': {
-            'Meta': {'object_name': 'NthXDayHoliday', '_ormbases': [u'holidays.Holiday']},
-            'day_of_week': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            u'holiday_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['holidays.Holiday']", 'unique': 'True', 'primary_key': 'True'}),
-            'nth': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
-        },
-        u'holidays.staticholiday': {
-            'Meta': {'object_name': 'StaticHoliday', '_ormbases': [u'holidays.Holiday']},
-            'day': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            u'holiday_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['holidays.Holiday']", 'unique': 'True', 'primary_key': 'True'})
-        }
-    }
-
-    complete_apps = ['holidays']
+    operations = [
+        migrations.CreateModel(
+            name='Holiday',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=64)),
+                ('month', models.PositiveSmallIntegerField(choices=[(1, b'January'), (2, b'February'), (3, b'March'), (4, b'April'), (5, b'May'), (6, b'June'), (7, b'July'), (8, b'August'), (9, b'September'), (10, b'October'), (11, b'November'), (12, b'December')])),
+                ('paid_holiday', models.BooleanField(default=False, help_text=b'If using this app for a business, is the holiday a paid holiday?')),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='CustomHoliday',
+            fields=[
+                ('holiday_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='holidays.Holiday')),
+                ('day', models.PositiveSmallIntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10), (11, 11), (12, 12), (13, 13), (14, 14), (15, 15), (16, 16), (17, 17), (18, 18), (19, 19), (20, 20), (21, 21), (22, 22), (23, 23), (24, 24), (25, 25), (26, 26), (27, 27), (28, 28), (29, 29), (30, 30), (31, 31)])),
+                ('year', models.PositiveSmallIntegerField()),
+            ],
+            bases=('holidays.holiday',),
+        ),
+        migrations.CreateModel(
+            name='NthXDayAfterHoliday',
+            fields=[
+                ('holiday_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='holidays.Holiday')),
+                ('nth', models.PositiveSmallIntegerField(choices=[(1, b'First'), (2, b'Second'), (3, b'Third'), (4, b'Fourth'), (5, b'Fifth')])),
+                ('day_of_week', models.PositiveSmallIntegerField(choices=[(0, b'Monday'), (1, b'Tuesday'), (2, b'Wednesday'), (3, b'Thursday'), (4, b'Friday'), (5, b'Saturday'), (6, b'Sunday')])),
+                ('after_nth', models.PositiveSmallIntegerField(choices=[(1, b'First'), (2, b'Second'), (3, b'Third'), (4, b'Fourth'), (5, b'Fifth')])),
+                ('after_day_of_week', models.PositiveSmallIntegerField(choices=[(0, b'Monday'), (1, b'Tuesday'), (2, b'Wednesday'), (3, b'Thursday'), (4, b'Friday'), (5, b'Saturday'), (6, b'Sunday')])),
+            ],
+            bases=('holidays.holiday',),
+        ),
+        migrations.CreateModel(
+            name='NthXDayHoliday',
+            fields=[
+                ('holiday_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='holidays.Holiday')),
+                ('nth', models.PositiveSmallIntegerField(choices=[(1, b'First'), (2, b'Second'), (3, b'Third'), (4, b'Fourth'), (5, b'Last')])),
+                ('day_of_week', models.PositiveSmallIntegerField(choices=[(0, b'Monday'), (1, b'Tuesday'), (2, b'Wednesday'), (3, b'Thursday'), (4, b'Friday'), (5, b'Saturday'), (6, b'Sunday')])),
+            ],
+            bases=('holidays.holiday',),
+        ),
+        migrations.CreateModel(
+            name='StaticHoliday',
+            fields=[
+                ('holiday_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='holidays.Holiday')),
+                ('day', models.PositiveSmallIntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10), (11, 11), (12, 12), (13, 13), (14, 14), (15, 15), (16, 16), (17, 17), (18, 18), (19, 19), (20, 20), (21, 21), (22, 22), (23, 23), (24, 24), (25, 25), (26, 26), (27, 27), (28, 28), (29, 29), (30, 30), (31, 31)])),
+            ],
+            bases=('holidays.holiday',),
+        ),
+    ]
