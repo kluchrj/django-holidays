@@ -1,9 +1,16 @@
-from dateutil.relativedelta import relativedelta
-import datetime
+from __future__ import unicode_literals
+
 import calendar
+import datetime
+
+from dateutil.relativedelta import relativedelta
+
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.encoding import python_2_unicode_compatible
 
+
+@python_2_unicode_compatible
 class Holiday(models.Model):
     MONTHS = {
         1:  'January',
@@ -21,14 +28,15 @@ class Holiday(models.Model):
     }
     name = models.CharField(max_length=64)
     month = models.PositiveSmallIntegerField(choices=MONTHS.items())
-    paid_holiday = models.BooleanField(default=False,
+    paid_holiday = models.BooleanField(
+        default=False,
         help_text='If using this app for a business, is the holiday a paid holiday?')
 
     class Meta:
         abstract = False
 
-    def __unicode__(self):
-        return unicode('%s (%s)') % (self.name, 'PAID' if self.paid_holiday else 'not paid')
+    def __str__(self):
+        return '{} ({})'.format(self.name, 'PAID' if self.paid_holiday else 'not paid')
 
     @classmethod
     def get_date_for_year(cls, name, year=datetime.date.today().year):
@@ -70,8 +78,8 @@ class Holiday(models.Model):
                 date -= relativedelta(days=1)
                 return date
             else:
-                date = datetime.date(year, holiday.month, 
-                    calendar.monthrange(year,holiday.month)[1])
+                date = datetime.date(
+                    year, holiday.month, calendar.monthrange(year, holiday.month)[1])
                 while date.weekday() != holiday.day_of_week:
                     date -= relativedelta(days=1)
                 return date
@@ -90,7 +98,7 @@ class Holiday(models.Model):
                     count += 1
                 after_date += relativedelta(days=1)
             after_date -= relativedelta(days=1)
-            
+
             date = after_date
             count = 0
             while count < holiday.nth:
@@ -106,7 +114,9 @@ class Holiday(models.Model):
         # for example, if Easter is a holiday, but just not available for 2020,
         # let's tell the user that rather than saying 'Holiday not found.'
         if Holiday.objects.filter(name=name).count() > 0:
-            raise ObjectDoesNotExist('Holiday with that name is found, but cannot determine date for the provided year.  Check your CustomHoliday table.')
+            raise ObjectDoesNotExist(
+                'Holiday with that name is found, but cannot determine date for '
+                'the provided year. Check your CustomHoliday table.')
         else:
             raise ObjectDoesNotExist('Holiday with that name cannot be found.')
 
@@ -115,7 +125,7 @@ class Holiday(models.Model):
         """Returns a list of all holiday names.
         TODO: could optionally provide a year.
         """
-        return [h['name'] for h in Holiday.objects.all().values('name').distinct()]
+        return Holiday.objects.all().values_list('name', flat=True).distinct()
 
     @classmethod
     def get_holidays_for_year(cls, year=datetime.date.today().year, kwargs={}):
@@ -169,10 +179,10 @@ class Holiday(models.Model):
         # TODO: improve how this is done, specifically the second check
         # (after checking the easy StaticHoliday table)
 
-        # checkt the StaticHoliday to see if the month and day exist in here.
+        # check the StaticHoliday to see if the month and day exist in here.
         try:
             h = StaticHoliday.objects.get(month=date.month, day=date.day)
-            return h
+            return dict(h)
         except:
             pass
 
@@ -192,7 +202,6 @@ class Holiday(models.Model):
         """
         # TODO: improve how this is done, specifically the second check
         # (after checking the easy StaticHoliday table)
-        print 'date', date
 
         # checkt the StaticHoliday to see if the month and day exist in here.
         try:
@@ -212,10 +221,10 @@ class Holiday(models.Model):
         return False
 
 class StaticHoliday(Holiday):
-    DAYS = [(i, i) for i in range(1,32)]
-    
+    DAYS = [(i, i) for i in range(1, 32)]
+
     day = models.PositiveSmallIntegerField(choices=DAYS)
-    
+
 
 class NthXDayHoliday(Holiday):
     NTHS = {
@@ -236,7 +245,7 @@ class NthXDayHoliday(Holiday):
     }
     nth = models.PositiveSmallIntegerField(choices=NTHS.items())
     day_of_week = models.PositiveSmallIntegerField(choices=DOWS.items())
-        
+
 
 class NthXDayAfterHoliday(Holiday):
     NTHS = {
@@ -259,13 +268,14 @@ class NthXDayAfterHoliday(Holiday):
     day_of_week = models.PositiveSmallIntegerField(choices=DOWS.items())
     after_nth = models.PositiveSmallIntegerField(choices=NTHS.items())
     after_day_of_week = models.PositiveSmallIntegerField(choices=DOWS.items())
-        
 
+
+@python_2_unicode_compatible
 class CustomHoliday(Holiday):
-    DAYS = [(i, i) for i in range(1,32)]
+    DAYS = [(i, i) for i in range(1, 32)]
 
-    def __unicode__(self):
-        return '%s %d' % (self.name, self.year)
-    
+    def __str__(self):
+        return '{} {}'.format(self.name, self.year)
+
     day = models.PositiveSmallIntegerField(choices=DAYS)
     year = models.PositiveSmallIntegerField()

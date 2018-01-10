@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=64)),
-                ('month', models.PositiveSmallIntegerField(choices=[(1, b'January'), (2, b'February'), (3, b'March'), (4, b'April'), (5, b'May'), (6, b'June'), (7, b'July'), (8, b'August'), (9, b'September'), (10, b'October'), (11, b'November'), (12, b'December')])),
-                ('paid_holiday', models.BooleanField(default=False, help_text=b'If using this app for a business, is the holiday a paid holiday?')),
+                ('month', models.PositiveSmallIntegerField(choices=[(1, 'January'), (2, 'February'), (3, 'March'), (4, 'April'), (5, 'May'), (6, 'June'), (7, 'July'), (8, 'August'), (9, 'September'), (10, 'October'), (11, 'November'), (12, 'December')])),
+                ('paid_holiday', models.BooleanField(default=False, help_text='If using this app for a business, is the holiday a paid holiday?')),
             ],
             options={
                 'abstract': False,
@@ -35,10 +35,10 @@ class Migration(migrations.Migration):
             name='NthXDayAfterHoliday',
             fields=[
                 ('holiday_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='holidays.Holiday')),
-                ('nth', models.PositiveSmallIntegerField(choices=[(1, b'First'), (2, b'Second'), (3, b'Third'), (4, b'Fourth'), (5, b'Fifth')])),
-                ('day_of_week', models.PositiveSmallIntegerField(choices=[(0, b'Monday'), (1, b'Tuesday'), (2, b'Wednesday'), (3, b'Thursday'), (4, b'Friday'), (5, b'Saturday'), (6, b'Sunday')])),
-                ('after_nth', models.PositiveSmallIntegerField(choices=[(1, b'First'), (2, b'Second'), (3, b'Third'), (4, b'Fourth'), (5, b'Fifth')])),
-                ('after_day_of_week', models.PositiveSmallIntegerField(choices=[(0, b'Monday'), (1, b'Tuesday'), (2, b'Wednesday'), (3, b'Thursday'), (4, b'Friday'), (5, b'Saturday'), (6, b'Sunday')])),
+                ('nth', models.PositiveSmallIntegerField(choices=[(1, 'First'), (2, 'Second'), (3, 'Third'), (4, 'Fourth'), (5, 'Fifth')])),
+                ('day_of_week', models.PositiveSmallIntegerField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')])),
+                ('after_nth', models.PositiveSmallIntegerField(choices=[(1, 'First'), (2, 'Second'), (3, 'Third'), (4, 'Fourth'), (5, 'Fifth')])),
+                ('after_day_of_week', models.PositiveSmallIntegerField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')])),
             ],
             bases=('holidays.holiday',),
         ),
@@ -46,8 +46,8 @@ class Migration(migrations.Migration):
             name='NthXDayHoliday',
             fields=[
                 ('holiday_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='holidays.Holiday')),
-                ('nth', models.PositiveSmallIntegerField(choices=[(1, b'First'), (2, b'Second'), (3, b'Third'), (4, b'Fourth'), (5, b'Last')])),
-                ('day_of_week', models.PositiveSmallIntegerField(choices=[(0, b'Monday'), (1, b'Tuesday'), (2, b'Wednesday'), (3, b'Thursday'), (4, b'Friday'), (5, b'Saturday'), (6, b'Sunday')])),
+                ('nth', models.PositiveSmallIntegerField(choices=[(1, 'First'), (2, 'Second'), (3, 'Third'), (4, 'Fourth'), (5, 'Last')])),
+                ('day_of_week', models.PositiveSmallIntegerField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')])),
             ],
             bases=('holidays.holiday',),
         ),

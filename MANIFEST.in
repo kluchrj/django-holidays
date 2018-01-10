@@ -1,0 +1,4 @@
+include LICENSE
+include README.md
+include holidays/fixtures/*
+include holidays/fixtures/*
